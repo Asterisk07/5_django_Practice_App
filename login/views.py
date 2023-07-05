@@ -4,7 +4,29 @@ import os
 
 # from django.http import HttpResponse
 # from sendfile import sendfile
+from django.http import JsonResponse
 
+def check_username_exists(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+
+        # Perform your logic to check if the username exists
+        # Replace this with your actual logic to check username existence
+        person = Person.objects.filter(name=name).first()
+
+        exists = True  
+        if not person:
+            exists = False  
+
+        response_data = {
+            'exists': exists
+        }
+
+        return JsonResponse(response_data)
+
+    # Return an empty response or handle other HTTP methods if needed
+    return JsonResponse({})
+    
 from django.http import FileResponse, Http404
 
 def serve_pdf(request,file1):

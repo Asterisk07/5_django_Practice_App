@@ -2,16 +2,18 @@
 <html>
 <head>
   <title>Simple Form</title>
+  
 </head>
 <body>
   <h1>Simple Form</h1>
   {% if error_message %}
   <p class="error">{{ error_message }}</p>
-{% endif %}
+  {% endif %}
   <form method="POST">
     {% csrf_token %}
     <label for="nameInput">Name:</label>
     <input type="text" id="nameInput" name="name" required>
+    <span id="userExistsMessage" class="error"> </span>
 
     <br><br>
 
@@ -23,4 +25,38 @@
     <input type="submit" value="Submit">
   </form>
 </body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    var debounceTimer;
+    
+    function checkUserExists() {
+      var username = $('#nameInput').val().trim();
+      
+      // Clear any previous timeout
+      clearTimeout(debounceTimer);
+      
+      // Set a new timeout to perform the AJAX request
+      debounceTimer = setTimeout(function() {
+        $.ajax({
+          url: '/check_username_exists/',
+          type: 'POST',
+          data: {username: username},
+          success: function(response) {
+            if (response.exists) {
+              $('#userExistsMessage').text('User exists.');
+            } else {
+              $('#userExistsMessage').text('User doesn\'t exist.');
+            }
+          },
+          error: function() {
+            // Handle error
+          }
+        });
+      }, 500); // Adjust the delay time as needed
+    }
+    
+    $(document).ready(function() {
+      $('#nameInput').on('input', checkUserExists);
+    });
+  </script>
 </html>
